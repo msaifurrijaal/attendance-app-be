@@ -11,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { UserJwtPayload } from './types/auth.type';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { mappingResponse } from 'src/utils/responseHandler.util';
 
 @Injectable()
 export class AuthService {
@@ -41,10 +42,10 @@ export class AuthService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...savedUser } = await this.userRepo.save(user);
 
-    return {
+    return mappingResponse({
       message: 'User registered successfully',
-      user: savedUser,
-    };
+      extras: { user: savedUser },
+    });
   }
 
   async generateTokens(user: UserJwtPayload) {
@@ -76,14 +77,15 @@ export class AuthService {
     const payload: UserJwtPayload = {
       id: user.id,
       email: user.email,
-      role: user.role.name,
+      role: user.role.code,
     };
 
     const tokens = await this.generateTokens(payload);
 
-    return {
-      ...tokens,
-    };
+    return mappingResponse({
+      message: 'User logged in successfully',
+      extras: { ...tokens },
+    });
   }
 
   async me(payload: UserJwtPayload) {
@@ -97,8 +99,9 @@ export class AuthService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...restData } = user;
 
-    return {
-      user: restData,
-    };
+    return mappingResponse({
+      message: 'User found successfully',
+      extras: { user: restData },
+    });
   }
 }
