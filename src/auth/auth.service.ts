@@ -46,7 +46,14 @@ export class AuthService {
 
       return mappingResponse({
         message: 'User registered successfully',
-        extras: { user: savedUser },
+        extras: {
+          user: {
+            ...savedUser,
+            image_url: savedUser.image_url
+              ? `${this.configService.get('APP_URL')}${savedUser.image_url}`
+              : null,
+          },
+        },
       });
     } catch (error) {
       errorHandler(error);
@@ -106,7 +113,14 @@ export class AuthService {
 
     return mappingResponse({
       message: 'User found successfully',
-      extras: { user: restData },
+      extras: {
+        user: {
+          ...restData,
+          image_url: restData.image_url
+            ? `${this.configService.get('APP_URL')}${restData.image_url}`
+            : null,
+        },
+      },
     });
   }
 
