@@ -61,3 +61,9 @@ export class LoginDto {
   @IsNotEmpty()
   password: string;
 }
+
+export class RefreshTokenDto {
+  @ApiProperty()
+  @IsString()
+  refresh_token: string;
+}

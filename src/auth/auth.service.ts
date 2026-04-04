@@ -12,6 +12,7 @@ import { UserJwtPayload } from './types/auth.type';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { mappingResponse } from 'src/utils/responseHandler.util';
+import { errorHandler } from 'src/utils/errorHandler.util';
 
 @Injectable()
 export class AuthService {
@@ -23,29 +24,33 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    const existing = await this.userRepo.findOne({
-      where: { email: dto.email },
-    });
+    try {
+      const existing = await this.userRepo.findOne({
+        where: { email: dto.email },
+      });
 
-    if (existing) {
-      throw new BadRequestException('Email already registered');
+      if (existing) {
+        throw new BadRequestException('Email already registered');
+      }
+
+      const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+      const user = this.userRepo.create({
+        ...dto,
+        email: dto.email.toLowerCase().trim(),
+        password: hashedPassword,
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...savedUser } = await this.userRepo.save(user);
+
+      return mappingResponse({
+        message: 'User registered successfully',
+        extras: { user: savedUser },
+      });
+    } catch (error) {
+      errorHandler(error);
     }
-
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
-
-    const user = this.userRepo.create({
-      ...dto,
-      email: dto.email.toLowerCase().trim(),
-      password: hashedPassword,
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...savedUser } = await this.userRepo.save(user);
-
-    return mappingResponse({
-      message: 'User registered successfully',
-      extras: { user: savedUser },
-    });
   }
 
   async generateTokens(user: UserJwtPayload) {
@@ -103,5 +108,37 @@ export class AuthService {
       message: 'User found successfully',
       extras: { user: restData },
     });
+  }
+
+  async refreshToken(refreshToken: string) {
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.configService.get('JWT_REFRESH_SECRET'),
+      });
+
+      const user = await this.userRepo.findOne({
+        where: { id: payload.id },
+        relations: { role: true },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      const newPayload = {
+        id: user.id,
+        email: user.email,
+        role: user.role.code,
+      };
+
+      const tokens = await this.generateTokens(newPayload);
+
+      return mappingResponse({
+        message: 'Token refreshed successfully',
+        extras: { ...tokens },
+      });
+    } catch (error) {
+      errorHandler(error);
+    }
   }
 }
