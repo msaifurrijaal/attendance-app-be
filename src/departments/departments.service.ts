@@ -1,8 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Department } from './departments.entity';
-import { Repository } from 'typeorm';
-import { CreateDepartmentDto, UpdateDepartmentDto } from './departments.dto';
+import { IsNull, Like, Repository } from 'typeorm';
+import {
+  CreateDepartmentDto,
+  GetDepartmentsDto,
+  UpdateDepartmentDto,
+} from './departments.dto';
+import { errorHandler } from 'src/utils/errorHandler.util';
+import { mappingResponse } from 'src/utils/responseHandler.util';
 
 @Injectable()
 export class DepartmentsService {
@@ -11,18 +17,112 @@ export class DepartmentsService {
     private repo: Repository<Department>,
   ) {}
 
-  create(dto: CreateDepartmentDto) {
-    const data = this.repo.create(dto);
-    return this.repo.save(data);
+  async create(dto: CreateDepartmentDto) {
+    try {
+      const data = this.repo.create(dto);
+      const result = await this.repo.save(data);
+      return mappingResponse({
+        message: 'Department created successfully',
+        extras: result,
+      });
+    } catch (error) {
+      errorHandler(error);
+    }
   }
 
-  async update(id: string, dto: UpdateDepartmentDto): Promise<Department> {
-    const data = await this.repo.findOneBy({ id });
+  async update(id: string, dto: UpdateDepartmentDto) {
+    try {
+      const data = await this.repo.findOneBy({ id, deleted_at: IsNull() });
 
-    if (!data)
-      throw new NotFoundException(`Department with id ${id} not found`);
-    Object.assign(data, dto);
+      if (!data)
+        throw new NotFoundException(`Department with id ${id} not found`);
+      Object.assign(data, dto);
 
-    return this.repo.save(data);
+      const result = await this.repo.save(data);
+      return mappingResponse({
+        message: 'Department updated successfully',
+        extras: result,
+      });
+    } catch (error) {
+      errorHandler(error);
+    }
+  }
+
+  async findById(id: string, withDeleted?: boolean) {
+    try {
+      const data = await this.repo.findOne({
+        where: { id },
+        withDeleted,
+      });
+
+      if (!data)
+        throw new NotFoundException(`Department with id ${id} not found`);
+
+      return mappingResponse({
+        message: 'Department found successfully',
+        extras: data,
+      });
+    } catch (error) {
+      errorHandler(error);
+    }
+  }
+
+  async findAll(dto: GetDepartmentsDto) {
+    const {
+      limit = 10,
+      page = 1,
+      search,
+      sort_by = 'updated_at',
+      sort_order = 'desc',
+      with_deleted,
+    } = dto;
+
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (search) {
+      where.name = Like(`%${search}%`);
+    }
+
+    try {
+      const [data, total] = await this.repo.findAndCount({
+        where,
+        order: { [sort_by]: sort_order },
+        take: limit,
+        skip,
+        withDeleted: with_deleted,
+      });
+
+      return mappingResponse({
+        message: 'Departments found successfully',
+        extras: {
+          data,
+          meta: {
+            page,
+            limit,
+            total,
+            total_pages: Math.ceil(total / limit),
+          },
+        },
+      });
+    } catch (error) {
+      errorHandler(error);
+    }
+  }
+
+  async delete(id: string) {
+    try {
+      const data = await this.repo.findOneBy({ id, deleted_at: IsNull() });
+
+      if (!data)
+        throw new NotFoundException(`Department with id ${id} not found`);
+
+      await this.repo.softRemove(data);
+
+      return mappingResponse({ message: 'Department deleted successfully' });
+    } catch (error) {
+      errorHandler(error);
+    }
   }
 }
