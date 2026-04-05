@@ -13,6 +13,7 @@ import { ConfigService } from '@nestjs/config';
         username: config.get('DB_USER'),
         password: config.get('DB_PASS'),
         database: config.get('DB_NAME'),
+        timezone: 'Z',
         autoLoadEntities: true,
         synchronize: false,
       }),

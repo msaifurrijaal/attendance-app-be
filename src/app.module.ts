@@ -8,6 +8,7 @@ import { RolesModule } from './roles/roles.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { AuthModule } from './auth/auth.module';
 import { UploadModule } from './upload/upload.module';
+import { AttendancesModule } from './attendances/attendances.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UploadModule } from './upload/upload.module';
     DepartmentsModule,
     AuthModule,
     UploadModule,
+    AttendancesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

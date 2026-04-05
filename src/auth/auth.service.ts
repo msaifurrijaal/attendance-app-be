@@ -13,6 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { mappingResponse } from 'src/utils/responseHandler.util';
 import { errorHandler } from 'src/utils/errorHandler.util';
+import { toPhotoUrl } from 'src/utils/photoUrl.util';
 
 @Injectable()
 export class AuthService {
@@ -49,9 +50,7 @@ export class AuthService {
         extras: {
           user: {
             ...savedUser,
-            image_url: savedUser.image_url
-              ? `${this.configService.get('APP_URL')}${savedUser.image_url}`
-              : null,
+            image_url: toPhotoUrl(savedUser.image_url),
           },
         },
       });
