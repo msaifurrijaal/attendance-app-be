@@ -13,7 +13,6 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { mappingResponse } from 'src/utils/responseHandler.util';
 import { errorHandler } from 'src/utils/errorHandler.util';
-import { toPhotoUrl } from 'src/utils/photoUrl.util';
 
 @Injectable()
 export class AuthService {
@@ -48,10 +47,7 @@ export class AuthService {
       return mappingResponse({
         message: 'User registered successfully',
         extras: {
-          user: {
-            ...savedUser,
-            image_url: toPhotoUrl(savedUser.image_url),
-          },
+          user: savedUser,
         },
       });
     } catch (error) {
@@ -108,7 +104,7 @@ export class AuthService {
     if (!user) throw new UnauthorizedException('User not found');
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...restData } = user;
+    const { password, role_id, department_id, ...restData } = user;
 
     return mappingResponse({
       message: 'User found successfully',

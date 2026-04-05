@@ -17,7 +17,6 @@ import {
 import { mappingResponse } from 'src/utils/responseHandler.util';
 import { errorHandler } from 'src/utils/errorHandler.util';
 import { ConfigService } from '@nestjs/config';
-import { toPhotoUrl } from 'src/utils/photoUrl.util';
 
 @Injectable()
 export class AttendancesService {
@@ -25,7 +24,7 @@ export class AttendancesService {
     @InjectRepository(Attendance)
     private readonly repo: Repository<Attendance>,
     private configService: ConfigService,
-  ) {}
+  ) { }
 
   async checkIn(dto: CheckInDto, user: UserJwtPayload) {
     try {
@@ -57,7 +56,6 @@ export class AttendancesService {
         extras: {
           data: {
             ...saved,
-            check_in_photo: toPhotoUrl(saved?.check_in_photo),
           },
         },
       });
@@ -94,11 +92,7 @@ export class AttendancesService {
       return mappingResponse({
         message: 'Check-out successful',
         extras: {
-          data: {
-            ...saved,
-            check_in_photo: toPhotoUrl(saved?.check_in_photo),
-            check_out_photo: toPhotoUrl(saved?.check_out_photo),
-          },
+          data: saved,
         },
       });
     } catch (error) {
@@ -136,11 +130,7 @@ export class AttendancesService {
       return mappingResponse({
         message: 'Attendance updated successfully',
         extras: {
-          data: {
-            ...saved,
-            check_in_photo: toPhotoUrl(saved?.check_in_photo),
-            check_out_photo: toPhotoUrl(saved?.check_out_photo),
-          },
+          data: saved,
         },
       });
     } catch (error) {
@@ -168,11 +158,8 @@ export class AttendancesService {
         extras: {
           data: {
             ...attendanceData,
-            check_in_photo: toPhotoUrl(attendanceData?.check_in_photo),
-            check_out_photo: toPhotoUrl(attendanceData?.check_out_photo),
             user: {
               ...userWithoutPassword,
-              image_url: toPhotoUrl(userWithoutPassword?.image_url),
             },
           },
         },
@@ -235,11 +222,8 @@ export class AttendancesService {
         const { password, ...userWithoutPassword } = user;
         return {
           ...attendanceData,
-          check_in_photo: toPhotoUrl(attendanceData?.check_in_photo),
-          check_out_photo: toPhotoUrl(attendanceData?.check_out_photo),
           user: {
             ...userWithoutPassword,
-            image_url: toPhotoUrl(userWithoutPassword?.image_url),
           },
         };
       });
