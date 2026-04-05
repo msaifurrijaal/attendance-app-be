@@ -22,7 +22,7 @@ export class AuthService {
     private readonly userRepo: Repository<User>,
     private jwtService: JwtService,
     private configService: ConfigService,
-  ) {}
+  ) { }
 
   async register(dto: RegisterDto) {
     try {
@@ -60,13 +60,13 @@ export class AuthService {
   }
 
   async generateTokens(user: UserJwtPayload) {
-    const accessToken = await this.jwtService.signAsync(user);
-    const refreshToken = await this.jwtService.signAsync(user, {
+    const access_token = await this.jwtService.signAsync(user);
+    const refresh_token = await this.jwtService.signAsync(user, {
       secret: this.configService.get('JWT_REFRESH_SECRET'),
       expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN'),
     });
 
-    return { accessToken, refreshToken };
+    return { access_token, refresh_token };
   }
 
   async login(dto: LoginDto) {
@@ -95,7 +95,7 @@ export class AuthService {
 
     return mappingResponse({
       message: 'User logged in successfully',
-      extras: { ...tokens },
+      extras: { data: { ...tokens } },
     });
   }
 
@@ -148,7 +148,7 @@ export class AuthService {
 
       return mappingResponse({
         message: 'Token refreshed successfully',
-        extras: { ...tokens },
+        extras: { data: { ...tokens } },
       });
     } catch (error) {
       errorHandler(error);

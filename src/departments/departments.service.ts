@@ -15,7 +15,7 @@ export class DepartmentsService {
   constructor(
     @InjectRepository(Department)
     private repo: Repository<Department>,
-  ) {}
+  ) { }
 
   async create(dto: CreateDepartmentDto) {
     try {
