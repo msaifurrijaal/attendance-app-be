@@ -77,6 +77,7 @@ export class DepartmentsService {
       with_deleted,
     } = dto;
 
+    const isPaginated = limit !== -1;
     const skip = (page - 1) * limit;
 
     const where: any = {};
@@ -85,13 +86,16 @@ export class DepartmentsService {
       where.name = Like(`%${search}%`);
     }
 
+    if (!with_deleted) {
+      where.deleted_at = IsNull();
+    }
+
     try {
       const [data, total] = await this.repo.findAndCount({
         where,
         order: { [sort_by]: sort_order },
-        take: limit,
-        skip,
         withDeleted: with_deleted,
+        ...(isPaginated && { take: limit, skip }),
       });
 
       return mappingResponse({
@@ -99,10 +103,10 @@ export class DepartmentsService {
         extras: {
           data,
           meta: {
-            page,
-            limit,
+            page: isPaginated ? page : 1,
+            limit: isPaginated ? limit : total,
             total,
-            total_pages: Math.ceil(total / limit),
+            total_pages: isPaginated ? Math.ceil(total / limit) : 1,
           },
         },
       });
