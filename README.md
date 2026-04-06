@@ -1,98 +1,166 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🕐 Attendance App — Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+> REST API untuk aplikasi absensi karyawan WFH berbasis NestJS. Dirancang untuk memudahkan HR dalam memantau kehadiran karyawan dan mengelola data master secara efisien.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 📋 Daftar Isi
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- [Instalasi](#-instalasi)
+- [Gambaran Aplikasi](#-gambaran-aplikasi)
+- [Tech Stack](#-tech-stack)
+- [Akun Bawaan](#-akun-bawaan)
 
-## Project setup
+---
+
+## 🚀 Instalasi
+
+### Langkah Instalasi
+
+**1. Clone repository**
 
 ```bash
-$ npm install
+git clone <repo-url>
+cd attendance-app-be
 ```
 
-## Compile and run the project
+**2. Install dependencies**
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
+**3. Konfigurasi environment**
+
+Buat file `.env` di root project:
+
+```env
+# Database
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASS=your_password
+DB_NAME=attendance_app      # sesuaikan dengan nama database Anda
+
+# JWT
+JWT_SECRET=your_jwt_secret_key
+JWT_EXPIRES_IN=1d
+JWT_REFRESH_SECRET=your_refresh_secret_key
+JWT_REFRESH_EXPIRES_IN=7d
+
+# App
+APP_URL=http://localhost:3000
+PORT=3000
+```
+
+> ⚠️ Pastikan nilai `JWT_SECRET` dan `JWT_REFRESH_SECRET` menggunakan string yang kuat dan unik.
+
+**4. Buat database**
+
+```sql
+CREATE DATABASE attendance_app;
+```
+
+> Sesuaikan nama database dengan nilai `DB_NAME` di file `.env`.
+
+**5. Jalankan migrasi**
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run typeorm migration:run
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+**6. Jalankan seeder**
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run seed
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+> Seeder akan membuat data awal untuk **roles**, **departments**, dan **users**. Lihat bagian [Akun Bawaan](#-akun-bawaan) untuk detail kredensial.
 
-## Resources
+**7. Jalankan aplikasi**
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+# Development
+npm run start:dev
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+# Production
+npm run start:prod
+```
 
-## Support
+Aplikasi akan berjalan di `http://localhost:3000`
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Dokumentasi Swagger tersedia di `http://localhost:3000/docs`
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 🌟 Gambaran Aplikasi
 
-## License
+Attendance App adalah sistem absensi berbasis web untuk karyawan yang bekerja dari rumah (WFH). Aplikasi ini memiliki dua peran utama: **Admin HR** dan **Employee**.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### Fitur Utama
+
+- 🔐 **Autentikasi & Otorisasi**
+  - Login dengan JWT Access Token & Refresh Token
+  - Role-based access control (RBAC) — Admin HR dan Employee
+
+- 👤 **Manajemen Karyawan** *(Admin HR)*
+  - CRUD data karyawan lengkap dengan foto profil
+  - Filter berdasarkan department dan pencarian nama
+  - Export data karyawan ke Excel
+  - Update password karyawan
+
+- 🏢 **Manajemen Department** *(Admin HR)*
+  - CRUD department
+  - Soft delete — data tidak hilang permanen
+  - Filter dan pencarian
+
+- ✅ **Absensi Karyawan**
+  - Check-in dengan upload foto sebagai bukti WFH
+  - Check-out dengan upload foto
+  - Timestamp otomatis dalam format UTC
+  - Riwayat absensi dengan filter tanggal
+
+- 📊 **Monitoring Absensi** *(Admin HR)*
+  - Lihat semua absensi karyawan
+  - Filter berdasarkan karyawan, department, dan rentang tanggal
+  - Export data absensi ke Excel
+
+- 📁 **Upload File**
+  - Upload foto profil dan foto absensi
+  - Validasi tipe file (jpg, jpeg, png, webp) dan ukuran maksimal 2MB
+  - File disimpan di internal storage server
+
+---
+
+## 🛠 Tech Stack
+
+| Teknologi | Keterangan |
+|-----------|------------|
+| **NestJS** | Framework utama backend |
+| **TypeORM** | ORM untuk database |
+| **MySQL** | Database |
+| **JWT** | Autentikasi |
+| **Multer** | Upload file |
+| **Swagger** | Dokumentasi API |
+| **bcrypt** | Enkripsi password |
+
+---
+
+## 👥 Akun Bawaan
+
+Setelah menjalankan seeder, tersedia akun berikut:
+
+| Nama | Email | Password | Role | Department |
+|------|-------|----------|------|------------|
+| Admin HR | `adminhr@mail.com` | `admin123` | Admin HR | Human Resource |
+| Developer Backend | `devbe@mail.com` | `employee123` | Employee | Information Technology |
+| Developer Frontend | `devfe@mail.com` | `employee123` | Employee | Information Technology |
+
+> 💡 Anda dapat melihat detail lengkap data seeder di folder `src/database/seeders/`.
+
+
+---
+
+<div align="center">
+  <p>Made with ❤️ using NestJS</p>
+</div>
