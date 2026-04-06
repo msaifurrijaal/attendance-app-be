@@ -115,6 +115,23 @@ export class DepartmentsService {
     }
   }
 
+  async getDepartmentHr() {
+    try {
+      const data = await this.repo.findOne({
+        where: { code: 'HUMAN_RESOURCE' },
+      });
+
+      if (!data) throw new NotFoundException('HR Department not found');
+
+      return mappingResponse({
+        message: 'HR Department found',
+        extras: { data },
+      });
+    } catch (error) {
+      errorHandler(error);
+    }
+  }
+
   async delete(id: string) {
     try {
       const data = await this.repo.findOneBy({ id, deleted_at: IsNull() });

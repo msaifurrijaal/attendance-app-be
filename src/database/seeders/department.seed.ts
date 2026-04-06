@@ -5,9 +5,9 @@ export async function departmentSeeder(dataSource: DataSource) {
   const repo = dataSource.getRepository(Department);
 
   const data = [
-    { code: 'HR', name: 'Human Resource' },
-    { code: 'IT', name: 'Information Technology' },
-    { code: 'FIN', name: 'Finance' },
+    { code: 'HUMAN_RESOURCE', name: 'Human Resource' },
+    { code: 'INFORMATION_TECHNLOGY', name: 'Information Technology' },
+    { code: 'FINANCE', name: 'Finance' },
   ];
 
   for (const item of data) {

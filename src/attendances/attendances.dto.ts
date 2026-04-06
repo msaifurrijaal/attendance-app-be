@@ -73,7 +73,6 @@ export class GetAttendancesDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
-  @Min(1)
   limit?: number;
 
   @ApiPropertyOptional({ example: 'uuid-user-id' })

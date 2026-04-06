@@ -1,8 +1,8 @@
-import { Controller, DefaultValuePipe, Delete, Get, Param, ParseBoolPipe, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Delete, Get, Param, ParseBoolPipe, Patch, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
-import { GetUsersDto } from './users.dto';
+import { GetUsersDto, UpdateUserDto } from './users.dto';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 
@@ -24,6 +24,13 @@ export class UsersController {
     @Query('with_deleted', new DefaultValuePipe(false), ParseBoolPipe) withDeleted: boolean,
   ) {
     return this.usersService.findById(id, withDeleted);
+  }
+
+  @Patch(':id')
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN_HR')
+  update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
+    return this.usersService.update(id, dto);
   }
 
   @Delete(':id')

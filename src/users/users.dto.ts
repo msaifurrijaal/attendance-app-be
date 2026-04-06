@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsBoolean, IsInt, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import { IsBoolean, IsEmail, IsInt, IsOptional, IsString, IsUUID, Min, MinLength } from 'class-validator';
 
 export class GetUsersDto {
   @ApiPropertyOptional({ example: 1 })
@@ -14,7 +14,6 @@ export class GetUsersDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
-  @Min(1)
   limit?: number;
 
   @ApiPropertyOptional({ example: 'John Doe' })
@@ -51,4 +50,52 @@ export class GetUsersDto {
   @IsOptional()
   @IsString()
   sort_order?: string;
+}
+
+export class UpdateUserDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  full_name?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MinLength(6)
+  password?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  role_id?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  department_id?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  address?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  image_url?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  position?: string;
 }

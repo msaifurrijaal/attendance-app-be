@@ -17,30 +17,39 @@ import {
   GetDepartmentsDto,
   UpdateDepartmentDto,
 } from './departments.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('departments')
 export class DepartmentsController {
-  constructor(private readonly departmentsService: DepartmentsService) {}
+  constructor(private readonly departmentsService: DepartmentsService) { }
 
   @Post()
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN_HR')
   create(@Body() createDepartmentDto: CreateDepartmentDto) {
     return this.departmentsService.create(createDepartmentDto);
   }
 
   @Get()
-  @Roles('ADMIN_HR')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   findAll(@Query() dto: GetDepartmentsDto) {
     return this.departmentsService.findAll(dto);
   }
 
+  @Get('hr')
+  @ApiOperation({ summary: 'Get HR department without auth' })
+  getDepartmentHr() {
+    return this.departmentsService.getDepartmentHr();
+  }
+
   @Get(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN_HR')
   findOne(
     @Param('id') id: string,
@@ -51,6 +60,8 @@ export class DepartmentsController {
   }
 
   @Patch(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN_HR')
   update(
     @Param('id') id: string,
@@ -60,6 +71,8 @@ export class DepartmentsController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN_HR')
   remove(@Param('id') id: string) {
     return this.departmentsService.delete(id);

@@ -2,9 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './users.entity';
 import { IsNull, Like, Repository } from 'typeorm';
-import { GetUsersDto } from './users.dto';
+import { GetUsersDto, UpdateUserDto } from './users.dto';
 import { mappingResponse } from 'src/utils/responseHandler.util';
 import { errorHandler } from 'src/utils/errorHandler.util';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -83,6 +84,28 @@ export class UsersService {
             ...restData,
           }
         },
+      });
+    } catch (error) {
+      errorHandler(error);
+    }
+  }
+
+  async update(id: string, dto: UpdateUserDto) {
+    try {
+      if (dto.password) {
+        dto.password = await bcrypt.hash(dto.password, 10);
+      }
+
+      const user = await this.repo.preload({ id, ...dto });
+      if (!user) throw new NotFoundException(`User with id ${id} not found`);
+
+      const saved = await this.repo.save(user);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...restData } = saved;
+
+      return mappingResponse({
+        message: 'User updated successfully',
+        extras: { data: restData },
       });
     } catch (error) {
       errorHandler(error);

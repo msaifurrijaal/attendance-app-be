@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { Role } from './roles.entity';
@@ -12,6 +12,23 @@ export class RolesService {
     @InjectRepository(Role)
     private readonly roleRepo: Repository<Role>,
   ) { }
+
+  async getRoleAdminHr() {
+    try {
+      const data = await this.roleRepo.findOne({
+        where: { code: 'ADMIN_HR' },
+      });
+
+      if (!data) throw new NotFoundException('Admin HR Role not found');
+
+      return mappingResponse({
+        message: 'Admin HR Role found',
+        extras: { data },
+      });
+    } catch (error) {
+      errorHandler(error);
+    }
+  }
 
   async findAll(dto: GetRolesDto) {
     const {

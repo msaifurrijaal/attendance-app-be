@@ -111,9 +111,6 @@ export class AuthService {
       extras: {
         user: {
           ...restData,
-          image_url: restData.image_url
-            ? `${this.configService.get('APP_URL')}${restData.image_url}`
-            : null,
         },
       },
     });
